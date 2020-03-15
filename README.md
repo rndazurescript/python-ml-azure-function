@@ -36,7 +36,11 @@ Optionally start the client and use the same github urls.
 
 ## Create Azure DevOps pipeline
 
-Register the azure-pipelines.yml and specify the following variables:
+Register an Azure DevOps pipeline using the azure-pipelines.yml in the root of this repo:
+
+![Register Azure DevOps pipeline](./README.ConfigureAzureDevOpsPipeline.png)
+
+Specify the following variables:
 - azureSubscription: The Azure DevOps Resource Manager connection to use for deployment.
 - functionAppName: The Azure Function App to deploy the model to.
 - vmImageName: Use `ubuntu-latest` or `windows-latest`.
