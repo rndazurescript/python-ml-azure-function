@@ -1,0 +1,65 @@
+trigger:
+- master
+
+variables:
+  # Azure Resource Manager connection (specified in ADO variables)
+  # azureSubscription: 'myAzureConnection'
+  # Function app name  (specified in ADO variables)
+  # functionAppName: 'myAzure-azfn'
+  # Agent VM image name (specified in ADO variables)
+  # vmImageName: 'ubuntu-latest'
+  # Working Directory
+  workingDirectory: '$(System.DefaultWorkingDirectory)/__app__'
+  # Python Version
+  pythonVersion: 3.7
+
+stages:
+- stage: Package
+  displayName: Package stage
+  jobs:
+  - job: Build
+    displayName: Build
+    pool:
+      vmImage: $(vmImageName)
+    steps:
+    - task: PublishPipelineArtifact@1
+      inputs:
+        targetPath: '$(workingDirectory)'
+        artifact: 'drop'
+        publishLocation: 'pipeline'
+
+- stage: Deploy
+  displayName: Deploy stage
+  dependsOn: Package
+  condition: succeeded()
+  jobs:
+  - deployment: Deploy
+    displayName: Deploy
+    environment: 'development'
+    pool:
+      vmImage: $(vmImageName)
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: FuncToolsInstaller@0
+            inputs:
+              version: 'latest'
+          - download: current
+            artifact: drop
+          #- task: AzureCLI@2
+          #  displayName: 'Verify that we can read existing deployed functions'
+          #  inputs:
+          #    azureSubscription: $(azureSubscription)
+          #    scriptType: 'pscore'
+          #    scriptLocation: 'inlineScript'
+          #    inlineScript: 'func azure functionapp list-functions  $(functionAppName)'
+          #    workingDirectory: '$(Pipeline.Workspace)/drop/'
+          - task: AzureCLI@2
+            displayName: 'Deploy new version of codebase'
+            inputs:
+              azureSubscription: $(azureSubscription)
+              scriptType: 'pscore'
+              scriptLocation: 'inlineScript'
+              inlineScript: 'func azure functionapp publish $(functionAppName) --python'
+              workingDirectory: '$(Pipeline.Workspace)/drop/'

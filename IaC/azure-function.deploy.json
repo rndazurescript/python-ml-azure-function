@@ -1,0 +1,168 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "azure_function_name": {
+            "defaultValue": "name-env-azfn",
+            "type": "string"
+        },
+        "storage_name": {
+            "defaultValue": "nameenvstg",
+            "type": "string"
+        }
+    },
+    "variables": {
+        "location": "[resourceGroup().location]",
+        "storageAccountConnectionStringPrefix": "[concat('DefaultEndpointsProtocol=https;AccountName=',parameters('storage_name'),';AccountKey=')]",
+        "storageApiVersion": "[providers('Microsoft.Storage','storageAccounts').apiVersions[0]]",
+        "storageAccountId": "[resourceId('Microsoft.Storage/storageAccounts',parameters('storage_name'))]",
+        "appInsightsApiVersion": "2015-05-01"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Insights/components",
+            "apiVersion": "[variables('appInsightsApiVersion')]",
+            "name": "[parameters('azure_function_name')]",
+            "location": "[variables('location')]",
+            "kind": "web",
+            "properties": {
+                "Application_Type": "web"
+            }
+        },
+        {
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "[variables('storageApiVersion')]",
+            "name": "[parameters('storage_name')]",
+            "location": "[variables('location')]",
+            "sku": {
+                "name": "Standard_LRS",
+                "tier": "Standard"
+            },
+            "kind": "Storage",
+            "properties": {
+                "networkAcls": {
+                    "bypass": "AzureServices",
+                    "virtualNetworkRules": [],
+                    "ipRules": [],
+                    "defaultAction": "Allow"
+                },
+                "supportsHttpsTrafficOnly": true,
+                "encryption": {
+                    "services": {
+                        "file": {
+                            "keyType": "Account",
+                            "enabled": true
+                        },
+                        "blob": {
+                            "keyType": "Account",
+                            "enabled": true
+                        }
+                    },
+                    "keySource": "Microsoft.Storage"
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Web/serverfarms",
+            "apiVersion": "2018-02-01",
+            "name": "[parameters('azure_function_name')]",
+            "location": "[variables('location')]",
+            "sku": {
+                "name": "Y1",
+                "tier": "Dynamic",
+                "size": "Y1",
+                "family": "Y",
+                "capacity": 0
+            },
+            "kind": "functionapp",
+            "properties": {
+                "perSiteScaling": false,
+                "maximumElasticWorkerCount": 1,
+                "isSpot": false,
+                "reserved": true,
+                "isXenon": false,
+                "hyperV": false,
+                "targetWorkerCount": 0,
+                "targetWorkerSizeId": 0
+            }
+        },
+        {
+            "type": "Microsoft.Web/sites",
+            "apiVersion": "[providers('Microsoft.Web','sites').apiVersions[0]]",
+            "name": "[parameters('azure_function_name')]",
+            "location": "[variables('location')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', parameters('azure_function_name'))]"
+            ],
+            "kind": "functionapp,linux",
+            "properties": {
+                "enabled": true,
+                "hostNameSslStates": [
+                    {
+                        "name": "[concat(parameters('azure_function_name'), '.azurewebsites.net')]",
+                        "sslState": "Disabled",
+                        "hostType": "Standard"
+                    },
+                    {
+                        "name": "[concat(parameters('azure_function_name'), '.scm.azurewebsites.net')]",
+                        "sslState": "Disabled",
+                        "hostType": "Repository"
+                    }
+                ],
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('azure_function_name'))]",
+                "reserved": true,
+                "isXenon": false,
+                "hyperV": false,
+                "scmSiteAlsoStopped": false,
+                "clientAffinityEnabled": false,
+                "clientCertEnabled": false,
+                "hostNamesDisabled": false,
+                "containerSize": 1536,
+                "dailyMemoryTimeQuota": 0,
+                "httpsOnly": false,
+                "redundancyMode": "None",
+                "siteConfig": {
+                    "linuxFxVersion": "PYTHON|3.7",
+                    "use32BitWorkerProcess": false,
+                    "webSocketsEnabled": false,
+                    "alwaysOn": false,
+                    "managedPipelineMode": "Integrated",
+                    "virtualApplications": [
+                        {
+                            "virtualPath": "/",
+                            "physicalPath": "site\\wwwroot",
+                            "preloadEnabled": false
+                        }
+                    ],
+                    "loadBalancing": "LeastRequests",
+                    "appSettings": [
+                        {
+                            "name": "AzureWebJobsStorage",
+                            "value": "[concat(variables('storageAccountConnectionStringPrefix'),listkeys(variables('storageAccountId'), variables('storageApiVersion')).keys[0].value)]"
+                        },
+                        {
+                            "name": "FUNCTIONS_EXTENSION_VERSION",
+                            "value": "~3"
+                        },
+                        {
+                            "name": "FUNCTIONS_WORKER_PROCESS_COUNT",
+                            "value": "10"
+                        },
+                        {
+                            "name": "FUNCTIONS_WORKER_RUNTIME",
+                            "value": "python"
+                        },
+                        {
+                            "name": "APPINSIGHTS_INSTRUMENTATIONKEY",
+                            "value": "[reference(resourceId('Microsoft.Insights/components', parameters('azure_function_name')), variables('appInsightsApiVersion')).InstrumentationKey]"
+                        },
+                        {
+                            "name": "APPLICATIONINSIGHTS_CONNECTION_STRING",
+                            "value": "[concat('InstrumentationKey=',reference(resourceId('Microsoft.Insights/components', parameters('azure_function_name')), variables('appInsightsApiVersion')).InstrumentationKey)]"
+                        }
+                    ]
+                }
+            }
+        }
+    ]
+}
