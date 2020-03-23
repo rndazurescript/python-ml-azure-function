@@ -32,7 +32,7 @@ stages:
 - stage: Deploy
   displayName: Deploy stage
   # dependsOn: Package
-  condition: succeeded()
+  # condition: succeeded()
   jobs:
   - deployment: Deploy
     displayName: Deploy
