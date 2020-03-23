@@ -50,16 +50,19 @@ stages:
             displayName: 'Allow gozip to execute in non windows environments'
             condition: ne(variables['Agent.OS'], 'Windows_NT')
             env:
-              toolsDir: variables['Agent.ToolsDirectory']
-              architecture: variables['Agent.OSArchitecture']
+              toolsDir: $(Agent.ToolsDirectory)
+              architecture: $(Agent.OSArchitecture)
             inputs:
               targetType: 'inline'
               script: 
                 echo "${toolsDir} ${architecture}"
+                ls -la
                 funcVersion=$(func --version)
                 echo "${funcVersion}"
+                ls -la
                 funcToolsPath="${toolsDir}/func/${funcVersion}/${architecture}/"
                 echo "${funcToolsPath}gozip"
+                ls -la
                 chmod +x "${funcToolsPath}gozip"
                 ls -la $funcToolsPath
           - download: current
