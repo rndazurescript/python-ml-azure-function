@@ -51,7 +51,7 @@ stages:
             inputs:
               targetType: 'inline'
               script: 'which func \
-              chmod +x /opt/hostedtoolcache/func/3.0.2358/x64/gozip'
+              sudo chmod +x /opt/hostedtoolcache/func/3.0.2358/x64/gozip'
           - download: current
             artifact: drop
           #- task: AzureCLI@2
