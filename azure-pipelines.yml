@@ -55,8 +55,8 @@ stages:
             inputs:
               targetType: 'inline'
               script: \
-                $funcVersion='$(func --version)' \
-                $funcToolsPath='${toolsDir}/func/${funcVersion}/${architecture}/' \
+                funcVersion=$(func --version) \
+                funcToolsPath='${toolsDir}/func/${funcVersion}/${architecture}/' \
                 chmod +x '${funcToolsPath}gozip'
                 ls -la $funcToolsPath
           - download: current
