@@ -55,10 +55,12 @@ stages:
             inputs:
               targetType: 'inline'
               script: 
+                echo "${toolsDir} ${architecture}""
                 funcVersion=$(func --version)
-                funcToolsPath='${toolsDir}/func/${funcVersion}/${architecture}/'
-                echo '${funcToolsPath}gozip'
-                chmod +x '${funcToolsPath}gozip'
+                echo "${funcVersion}"
+                funcToolsPath="${toolsDir}/func/${funcVersion}/${architecture}/"
+                echo "${funcToolsPath}gozip"
+                chmod +x "${funcToolsPath}gozip"
                 ls -la $funcToolsPath
           - download: current
             artifact: drop
