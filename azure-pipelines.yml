@@ -46,6 +46,7 @@ stages:
             inputs:
               version: 'latest'
           - task: Bash@3
+            displayName: 'Allow gozip to execute in non windows environments'
             condition: ne(variables['Agent.OS'], 'Windows_NT')
             inputs:
               targetType: 'inline'
