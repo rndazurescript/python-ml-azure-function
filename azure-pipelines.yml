@@ -55,7 +55,7 @@ stages:
             inputs:
               targetType: 'inline'
               script: 
-                echo "${toolsDir} ${architecture}""
+                echo "${toolsDir} ${architecture}"
                 funcVersion=$(func --version)
                 echo "${funcVersion}"
                 funcToolsPath="${toolsDir}/func/${funcVersion}/${architecture}/"
