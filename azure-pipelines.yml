@@ -54,9 +54,9 @@ stages:
               architecture: $(variables['Agent.OSArchitecture'])
             inputs:
               targetType: 'inline'
-              script: \
-                funcVersion=$(func --version) \
-                funcToolsPath='${toolsDir}/func/${funcVersion}/${architecture}/' \
+              script: 
+                funcVersion=$(func --version)
+                funcToolsPath='${toolsDir}/func/${funcVersion}/${architecture}/'
                 chmod +x '${funcToolsPath}gozip'
                 ls -la $funcToolsPath
           - download: current
