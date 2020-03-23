@@ -50,8 +50,8 @@ stages:
             displayName: 'Allow gozip to execute in non windows environments'
             condition: ne(variables['Agent.OS'], 'Windows_NT')
             env:
-              toolsDir: $(variables['Agent.ToolsDirectory'])
-              architecture: $(variables['Agent.OSArchitecture'])
+              toolsDir: variables['Agent.ToolsDirectory']
+              architecture: variables['Agent.OSArchitecture']
             inputs:
               targetType: 'inline'
               script: 
