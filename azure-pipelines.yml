@@ -48,10 +48,16 @@ stages:
           - task: Bash@3
             displayName: 'Allow gozip to execute in non windows environments'
             condition: ne(variables['Agent.OS'], 'Windows_NT')
+            env:
+              toolsDir: $(variables['Agent.ToolsDirectory'])
+              architecture: $(variables['Agent.OSArchitecture'])
             inputs:
               targetType: 'inline'
-              script: 'which func \
-              sudo chmod +x /opt/hostedtoolcache/func/3.0.2358/x64/gozip'
+              script: \
+                $funcVersion= $(func --version) \
+                $funcToolsPath= '${toolsDir}/func/${funcVersion}/${architecture}/' \
+                chmod +x '${funcToolsPath}gozip'
+                ls -la $funcToolsPath
           - download: current
             artifact: drop
           #- task: AzureCLI@2
