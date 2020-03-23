@@ -15,7 +15,6 @@ variables:
 
 stages:
 - stage: Package
-  condition: false # Disable to debug func tools
   displayName: Package stage
   jobs:
   - job: Build
@@ -47,7 +46,7 @@ stages:
             inputs:
               version: 'latest'
           - task: Bash@3
-            displayName: 'Allow gozip to execute in non windows environments'
+            displayName: 'Allow gozip to execute in non windows environments #1899'
             condition: ne(variables['Agent.OS'], 'Windows_NT')
             env:
               toolsDir: $(Agent.ToolsDirectory)
@@ -57,10 +56,10 @@ stages:
               script: |
                 funcVersion=$(func --version)
                 funcToolsPath="${toolsDir}/func/${funcVersion}/${architecture,,}/"
+                echo "Making executable the following file: ${funcToolsPath}gozip"
                 chmod +x "${funcToolsPath}gozip"
-                cd $funcToolsPath
-                ls -la
           - download: current
+            displayName: 'Download packaged artifacts'
             artifact: drop
           #- task: AzureCLI@2
           #  displayName: 'Verify that we can read existing deployed functions'
