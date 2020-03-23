@@ -45,6 +45,11 @@ stages:
           - task: FuncToolsInstaller@0
             inputs:
               version: 'latest'
+          - task: Bash@3
+            condition: not(startsWith($(vmImageName), 'windows'))
+            inputs:
+              targetType: 'inline'
+              script: 'chmod +x /usr/local/bin/azure-functions-cli/gozip'
           - download: current
             artifact: drop
           #- task: AzureCLI@2
