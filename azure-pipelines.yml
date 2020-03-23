@@ -54,7 +54,7 @@ stages:
               architecture: $(Agent.OSArchitecture)
             inputs:
               targetType: 'inline'
-              script: 
+              script: |
                 echo "${toolsDir} ${architecture}"
                 ls -la
                 funcVersion=$(func --version)
