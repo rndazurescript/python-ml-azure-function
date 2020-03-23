@@ -64,7 +64,8 @@ stages:
                 echo "${funcToolsPath}gozip"
                 ls -la
                 chmod +x "${funcToolsPath}gozip"
-                ls -la $funcToolsPath
+                cd $funcToolsPath
+                ls -la
           - download: current
             artifact: drop
           #- task: AzureCLI@2
