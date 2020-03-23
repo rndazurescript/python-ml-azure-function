@@ -46,7 +46,7 @@ stages:
             inputs:
               version: 'latest'
           - task: Bash@3
-            condition: not(startsWith($(vmImageName), 'windows'))
+            condition: ne(variables[Agent.OS], 'Windows_NT')
             inputs:
               targetType: 'inline'
               script: 'chmod +x /usr/local/bin/azure-functions-cli/gozip'
