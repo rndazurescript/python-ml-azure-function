@@ -31,7 +31,7 @@ stages:
 
 - stage: Deploy
   displayName: Deploy stage
-  dependsOn: Package
+  # dependsOn: Package
   condition: succeeded()
   jobs:
   - deployment: Deploy
