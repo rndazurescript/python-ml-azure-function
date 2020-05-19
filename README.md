@@ -46,3 +46,18 @@ Specify the following variables:
 - vmImageName: Use `ubuntu-latest` or `windows-latest`.
 
 ![Azure DevOps variables](./README.devopsvariables.png)
+
+
+## Test the model is running
+
+In order to test if the model is working fine, install pytest
+```
+pip install pytest
+```
+
+and then navigate in the `__app__` folder and run `pytest`:
+
+```
+cd __app__
+pytest
+```
